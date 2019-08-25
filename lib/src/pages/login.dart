@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = new GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold(      
       backgroundColor: Color.fromRGBO(114, 100, 201, 1),
       body: SafeArea(
           child: Stack(
@@ -186,4 +186,8 @@ class _LoginPageState extends State<LoginPage> {
       setState( () => _isLoading = false );
     }
   }
+
+
+
+
 }

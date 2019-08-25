@@ -23,6 +23,7 @@ dependencies:
   shared_preferences: ^0.5.3+4
   flutter_datetime_picker:
   flutter_circular_chart: ^0.1.0
+  flutter_swiper: 
 
 
   # The following adds the Cupertino Icons font to your application.

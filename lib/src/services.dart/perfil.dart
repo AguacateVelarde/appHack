@@ -1,6 +1,5 @@
 import 'dart:_http';
 import 'dart:async';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:kompass/src/services.dart/token.dart';
 
