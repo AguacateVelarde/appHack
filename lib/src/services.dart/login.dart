@@ -7,7 +7,7 @@ class LoginSevice{
   var client = new http.Client();
   Map<String, String> headers = {
   'Content-type' : 'application/json', 
-  'Accept': 'application/json',
+  'Accept': 'application/json'
 };
 
   Future login( String user, String password ) async {
