@@ -29,10 +29,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String token = '';
+
   @override
   void didChangeDependencies() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
      setState(()=> token = prefs.getString('token'));
+     //print('Tokenizado $token' );
     super.didChangeDependencies();
   }
   @override
@@ -40,7 +42,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Películas',
-      initialRoute: token == '' ? 'home' :'login',
+      initialRoute: token != '' ? 'home' :'login',
       routes: {
         'home' : (BuildContext context) => HomePage(),
         'login' : (BuildContext context ) => LoginPage(),

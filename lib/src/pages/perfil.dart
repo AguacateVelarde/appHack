@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_circular_chart/flutter_circular_chart.dart';
 import 'package:kompass/src/pages/facturacion.dart';
+import 'package:kompass/src/services/perfil.dart';
+import 'package:kompass/src/services/truncate.dart';
 
 class PerfilPage extends StatefulWidget {
   PerfilPage({Key key}) : super(key: key);
@@ -9,8 +11,13 @@ class PerfilPage extends StatefulWidget {
 }
 
 class _PerfilPageState extends State<PerfilPage> {
+  
   ScrollController _controller;
   Color clr = Colors.white;
+  Map<String, dynamic> facturas ;
+  bool _loading = true;
+  PerfilService _perfilService = PerfilService();
+  var finanzas ; 
   final GlobalKey<AnimatedCircularChartState> _chartKey =
       new GlobalKey<AnimatedCircularChartState>();
 
@@ -18,14 +25,31 @@ class _PerfilPageState extends State<PerfilPage> {
   void initState() {
     _controller = ScrollController();
     _controller.addListener(_scrollListener);
+    initDynamic();
+    
     super.initState();
+  }
+  initDynamic() async {
+    final dataGastos = await _perfilService.gastos();
+    setState( () => facturas = dataGastos );
+    print( facturas.toString() );
+    final dat = await _perfilService.finanzas();
+    setState(() => finanzas = dat );
+    print( finanzas );
+
+
+    setState(()=> _loading = false );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Container(child: buildCustomScrollView()),
+      body: _loading ? 
+        Center(
+      child: new CircularProgressIndicator(),
+    ) 
+      : Container(child: buildCustomScrollView()),
     );
   }
 
@@ -40,7 +64,7 @@ class _PerfilPageState extends State<PerfilPage> {
             titlePadding: EdgeInsets.all(0.0),
             centerTitle: false,
             title: Padding(
-              padding: const EdgeInsets.only(left: 10.0, bottom: 20.0),
+              padding: const EdgeInsets.only(left: 10.0, bottom: 5.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +81,7 @@ class _PerfilPageState extends State<PerfilPage> {
           backgroundColor: Colors.white,
         ),
         SliverFixedExtentList(
-          itemExtent: 1000,
+          itemExtent: 900,
           delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
               return Column(
@@ -137,7 +161,21 @@ class _PerfilPageState extends State<PerfilPage> {
     ));
   }
 
+  calcula(double percent, double quantity){
+    if(percent < 0) return 0.0;
+    return percent * 100 /quantity;
+  }
+
   Widget _circularChart() {
+    double total = 
+    double.parse(facturas['Ventas'].toString()) < 0 ? double.parse(facturas['Ventas'].toString()) : 0+ 
+    double.parse(facturas['Gastos'].toString()) < 0 ? double.parse(facturas['Gastos'].toString()) : 0 +
+    double.parse(facturas['Ganancias'].toString()) < 0 ? double.parse(facturas['Ganancias'].toString()) : 0;
+
+    double ventas = calcula( double.parse(facturas['Ventas'].toString()) , total );
+    double gastos = calcula( double.parse(facturas['Gastos'].toString()) , total );
+    double ganancias = calcula( double.parse(facturas['Ganancias'].toString()) , total );
+
     return AnimatedCircularChart(
       key: _chartKey,
       size: const Size(200.0, 200.0),
@@ -145,17 +183,17 @@ class _PerfilPageState extends State<PerfilPage> {
         CircularStackEntry(
           <CircularSegmentEntry>[
             CircularSegmentEntry(
-              33.33,
+              ventas,
               Color.fromRGBO(88, 97, 195, 1),
               rankKey: 'completed',
             ),
             CircularSegmentEntry(
-              33.33,
+              gastos,
              Color.fromRGBO(0, 194, 162, 1),
               rankKey: 'remaining',
             ),
             CircularSegmentEntry(
-              33.33,
+              ganancias,
               Color.fromRGBO(255, 204, 102, 1),
               rankKey: 'remaining',
             )
@@ -194,28 +232,42 @@ class _PerfilPageState extends State<PerfilPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             smallCuadritos(
-              Icons.data_usage, '\$9,0000,000', 'Tu mejor cliente', false),
+              Icons.data_usage, '\$${ format( finanzas['mejorCliente']['Total'] ) }', 'Tu mejor cliente', false),
             smallCuadritos(
-                Icons.check, '\$9,0000,000', 'Tu venta más grande', true)
+                Icons.check, '\$${ format(finanzas['ventaGrande']['Total']) }', 'Venta más grande', true)
           ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             smallCuadritos(
-                Icons.poll, '\$9,0000,000', 'Mayor gasto', true),
+                Icons.poll, '\$${ format(finanzas['mayorGasto']['Total']) }',  'Mayor gasto', true),
             smallCuadritos(
-                Icons.graphic_eq, '\$9,0000,000', 'Menor gasto', false)
+                Icons.graphic_eq, '\$${ finanzas['menorGasto']['Total'] }', 'Menor gasto', false)
           ],
         ),
             Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             smallCuadritos(
-                Icons.payment, '\$9,0000,000', 'Iva cobrado', false),
+                Icons.payment, '\$${ format(finanzas['ivaCobrado'])}', 'Iva cobrado', false),
             smallCuadritos(
-                Icons.payment, '\$9,0000,000', 'Iva pagado', true)
+                Icons.payment, '\$${ format(finanzas['ivaPagado'])}', 'Iva pagado', true)
           ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top:18.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              RaisedButton(
+                color: Color.fromRGBO(88, 97, 195, 1),
+                textColor: Colors.white,
+                onPressed: () => _perfilService.logout(context), 
+                child: Text('Cerrar sesiòn'),
+                 shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))
+              )
+          ],),
         )
       ],
     );

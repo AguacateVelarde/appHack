@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kompass/src/services.dart/login.dart';
+import 'package:kompass/src/services/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 enum FormMode { LOGIN, SIGNUP }
 
@@ -88,20 +89,24 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0), color: Colors.white),
-      child: TextField(
-          controller: emailController,
-          maxLines: 1,
-          keyboardType: TextInputType.emailAddress,
-          decoration: InputDecoration(
-            hintText: "Usuario o RFC",
-            fillColor: Colors.white,
-            border: new OutlineInputBorder(
-              borderRadius: new BorderRadius.circular(15.0),
-              borderSide: new BorderSide(),
+      child: Container(
+        height: 50.0,
+        child: TextField(
+            controller: emailController,
+            maxLines: 1,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              hintText: "Usuario o RFC",
+              fillColor: Colors.white,
+              border: new OutlineInputBorder(
+                borderRadius: new BorderRadius.circular(15.0),
+                borderSide: new BorderSide(),
+              ),
             ),
-          ),
-          
+            
+        ),
       )
+
     );
   }
 
@@ -126,19 +131,23 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0), color: Colors.white),
-      child: TextField(
-        controller: passwordController,
-          keyboardType: TextInputType.emailAddress,
-          obscureText: true,
-          decoration: InputDecoration(
-            hintText: "Contraseña",
-            labelStyle: TextStyle(color: Colors.black),
-            fillColor: Colors.white,
-            border: new OutlineInputBorder(
-              borderRadius: new BorderRadius.circular(15.0),
-              borderSide: new BorderSide(),
+      child: Container(
+        height: 50.0,
+        child: TextField(
+          
+          controller: passwordController,
+            keyboardType: TextInputType.emailAddress,
+            obscureText: true,
+            decoration: InputDecoration(
+              hintText: "Contraseña",
+              labelStyle: TextStyle(color: Colors.black),
+              fillColor: Colors.white,
+              border: new OutlineInputBorder(
+                borderRadius: new BorderRadius.circular(15.0),
+                borderSide: new BorderSide(),
+              ),
             ),
-          ),
+        ),
       )
     );
   }
@@ -182,7 +191,15 @@ class _LoginPageState extends State<LoginPage> {
       }
       setState( () => _isLoading = false );
     } else {
-      print('error');
+    Fluttertoast.showToast(
+        msg: "This is Center Short Toast",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIos: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
       setState( () => _isLoading = false );
     }
   }

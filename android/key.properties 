@@ -1,0 +1,4 @@
+storePassword=basilisco
+keyPassword=basilisco
+keyAlias=key
+storeFile=/Users/leo/key.jks
